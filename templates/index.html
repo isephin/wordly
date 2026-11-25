@@ -13,6 +13,7 @@
         <div class="nav-links">
             <a href="#analyzer">Analyzer</a>
             <a href="#benchmarks">Benchmarks</a>
+            <a href="/distributed">Distributed</a>
         </div>
         <span class="system-status">● Local</span>
     </nav>
@@ -129,7 +130,7 @@
 <label>Minimum word length <input id="opt-length" type="number" min="1" max="100" value="1"></label>
 <label>Minimum count to show <input id="opt-frequency" type="number" min="1" value="1"></label>
 <label>Analysis type <select id="opt-ngram"><option value="1">Words</option><option value="2">Two-word phrases</option><option value="3">Three-word phrases</option></select></label>
-<label>Parallel workers <select id="opt-workers"><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+<label>Parallel workers <select id="opt-workers"><option value="auto">Automatic</option>{% for n in range(2, worker_limit+1) %}<option{% if n == 2 %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
 <label>Exclude words <input id="opt-exclude" placeholder="event, seminar"></label>
 <label>Include only <input id="opt-include" placeholder="Leave blank for all"></label>
 </div><p>Phrases cannot cross lines or skipped words. Minimum count changes the displayed results, not the totals. Grouping word forms ignores case.</p><button id="reset-options" class="secondary">Reset settings</button></details>
@@ -202,7 +203,15 @@
             <div class="section-heading">
                 
                 <h2>Benchmarks</h2>
-                <p>Original baseline (analyzer.py) · 10 runs per dataset · 2 workers. The live analyzer uses separate configurable settings.</p>
+                <p>Sequential vs. parallel · 8 trials per configuration</p>
+            </div>
+            <p>Recorded on an Apple M4 Pro (14 logical CPUs) using generated campus feedback and default filters. File reading and charts are not timed.</p>
+            <div class="tools"><label for="scaling-workers">Parallel workers <select id="scaling-workers" disabled><option value="best">Best parallel time</option></select></label></div>
+            <p id="scaling-note" role="status">Loading recorded results…</p>
+            <div id="scaling-graph"></div>
+            <div class="table-wrapper"><table><thead><tr><th>Responses</th><th>Workers</th><th>Sequential</th><th>Parallel</th><th>Speedup</th><th>Efficiency</th></tr></thead><tbody id="scaling-table"></tbody></table></div>
+            <details class="advanced"><summary>Original benchmark</summary>
+            <div class="section-heading"><p>Original analyzer · 2 workers · 10 paired trials per dataset. Uses a different counting engine.</p>
             </div>
 
             <div id="benchmark-graph"></div>
@@ -221,6 +230,7 @@
                     <tbody id="benchmark-table"></tbody>
                 </table>
             </div>
+            </details>
         </section>
     </main>
 
@@ -231,5 +241,6 @@
 
     <button id="back-to-top" type="button" aria-label="Back to top" title="Back to top" hidden><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
     <script src="/static/app.js"></script>
+    <script src="/static/scaling-benchmarks.js"></script>
 </body>
 </html>

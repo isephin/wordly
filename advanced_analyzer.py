@@ -6,6 +6,7 @@ from multiprocessing import get_context
 from time import perf_counter
 from analyzer import STOP_WORDS
 from functools import lru_cache
+from worker_policy import worker_limit
 
 @lru_cache(maxsize=1)
 def stemmer():
@@ -19,7 +20,7 @@ def options(raw):
         raise ValueError("Choose either case sensitivity or grouping word forms, not both.")
     def number(key, default, low, high):
         return max(low, min(high, int(raw.get(key, default))))
-    return dict(stop=bool(raw.get('stop', True)), case=bool(raw.get('case', False)), numbers=bool(raw.get('numbers', False)), stem=bool(raw.get('stem', False)), length=number('length',1,1,100), frequency=number('frequency',1,1,100000000), ngram=number('ngram',1,1,3), workers=number('workers',2,2,8), exclude=str(raw.get('exclude','')), include=str(raw.get('include','')))
+    return dict(stop=bool(raw.get('stop', True)), case=bool(raw.get('case', False)), numbers=bool(raw.get('numbers', False)), stem=bool(raw.get('stem', False)), length=number('length',1,1,100), frequency=number('frequency',1,1,100000000), ngram=number('ngram',1,1,3), workers=number('workers',2,2,worker_limit()), exclude=str(raw.get('exclude','')), include=str(raw.get('include','')))
 
 def tokens(text, opt):
     pattern = r'[^\W_]+' if opt['numbers'] else r'[^\W\d_]+'

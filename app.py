@@ -2,6 +2,7 @@ import csv
 import json
 from threading import Lock
 from advanced_analyzer import options, run, terms, word_statistics
+from worker_policy import worker_limit, select_workers
 from file_reader import extract
 from pathlib import Path
 
@@ -19,6 +20,9 @@ app.config["MAX_FORM_MEMORY_SIZE"] = 100 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 app.config["MAX_FORM_PARTS"] = 100
 ANALYSIS_LOCK = Lock()
+from distributed_web import bp as distributed_bp
+app.config["WORDLY_ANALYSIS_LOCK"] = ANALYSIS_LOCK
+app.register_blueprint(distributed_bp)
 MAX_LINES = 1_100_000
 MAX_CHARS = 60_000_000
 
@@ -34,7 +38,7 @@ DATASETS = {
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", worker_limit=worker_limit())
 
 
 @app.route("/api/columns", methods=["POST"])
@@ -49,7 +53,9 @@ def columns():
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
     try:
-        opt=options(json.loads(request.form.get('options','{}')))
+        raw_options=json.loads(request.form.get('options','{}'))
+        requested_workers=raw_options.get('workers',2)
+        opt=options({**raw_options,'workers':2})
         uploads=[f for f in request.files.getlist('file') if f.filename]
         if len(uploads) > 10:
             raise ValueError("Upload up to 10 files at a time.")
@@ -69,8 +75,10 @@ def analyze():
         if not lines: raise ValueError('No text found.')
         if len(lines) > MAX_LINES or sum(map(len, lines)) > MAX_CHARS:
             raise ValueError("Text exceeds the analysis limit (1.1 million lines or 60 million characters).")
+        n, selection = select_workers(len(lines), requested_workers)
+        opt['workers']=n
         with ANALYSIS_LOCK:
-            seq, st = run(lines, opt)
+            seq, st = run(lines, {**opt,'workers':2})
             par, pt = run(lines, opt, True)
         ranked=sorted(((w,n) for w,n in seq.items() if n>=opt['frequency']),key=lambda x:(-x[1],x[0]))
         words=[dict(word=w,count=n) for w,n in ranked]
@@ -83,7 +91,7 @@ def analyze():
             for name,rows in docs:
                 c,_=run(rows,opt)
                 comparison.append(dict(name=name,total=sum(c.values()), counts=dict(c)))
-        return jsonify(filename=', '.join(name for name,_ in docs), responses=len(lines), total_words=total, unique_words=len(seq), raw_words=raw, excluded_words=excluded, characters=sum(len(line.rstrip('\r\n')) for line in lines), sequential=st, parallel=pt, speedup=st/pt, efficiency=st/pt/opt['workers']*100, identical=seq==par, words=words, options=opt, preview=preview, comparison=comparison)
+        return jsonify(filename=', '.join(name for name,_ in docs), responses=len(lines), total_words=total, unique_words=len(seq), raw_words=raw, excluded_words=excluded, characters=sum(len(line.rstrip('\r\n')) for line in lines), sequential=st, parallel=pt, speedup=st/pt, efficiency=st/pt/opt['workers']*100, identical=seq==par, words=words, options=opt, worker_selection=selection, preview=preview, comparison=comparison)
     except Exception as e:
         return jsonify(error=str(e)),400
 
@@ -95,6 +103,15 @@ def benchmarks():
         return jsonify([])
 
     with path.open(encoding="utf-8") as file:
+        return jsonify(list(csv.DictReader(file)))
+
+
+@app.get("/api/benchmarks/scaling")
+def scaling_benchmarks():
+    path = BASE / "results" / "published" / "scaling_v3_3_summary.csv"
+    if not path.exists():
+        return jsonify([])
+    with path.open(encoding="utf-8", newline="") as file:
         return jsonify(list(csv.DictReader(file)))
 
 
