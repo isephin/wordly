@@ -71,7 +71,7 @@ Requests are limited to 100 MiB, 10 uploaded files, 1.1 million nonempty lines a
 
 ![Recorded baseline benchmarks](assets/readme/benchmarks.png)
 
-The archived CSV files in `results/` are the original two-worker baseline, not timings of the configurable web engine. Four synthetic datasets (1,000; 10,000; 100,000; 1,000,000 lines) were tested in ten paired trials each, alternating execution order. Timing includes chunk creation, counting, process startup, transfer, merging and shutdown; excludes input reading, extraction, UI and output. Speedup = mean sequential time / mean parallel time; efficiency = speedup / worker count × 100%. Efficiency is not CPU utilization. All 40 paired trials agreed on complete frequency counters. Results are device- and workload-specific. Synthetic feedback uses a limited set of templates, not actual survey responses. No distributed machines are used. The web interface was added after the baseline experiment and has additional settings; live results are single-run measurements, not the archived averages.
+The archived CSV files in `results/` are the original two-worker baseline, not timings of the configurable web engine. Four synthetic datasets (1,000; 10,000; 100,000; 1,000,000 lines) were tested in ten paired trials each, alternating execution order. Timing includes chunk creation, counting, process startup, transfer, merging and shutdown; excludes input reading, extraction, UI and output. Speedup = mean sequential time / mean parallel time; efficiency = speedup / worker count × 100%. Efficiency is not CPU utilization. All 40 paired trials agreed on complete frequency counters. Results are device- and workload-specific. 
 
 ## Tests
 
@@ -83,10 +83,10 @@ python test_web.py
 python test_word_statistics.py
 ```
 
-The last command requires Flask. Browser checks: analyze pasted text, sample data and files; verify counts and charts, comparison, downloads, history, keyboard controls and mobile layout. Do not treat syntax checks as browser tests.
+The last command requires Flask. Browser checks: analyze pasted text, sample data and files; verify counts and charts, comparison, downloads, history, keyboard controls and mobile layout. 
 
 ## Final documentation note
 
-The original proposal excluded a graphical interface. The delivered application adds an optional local web interface while preserving the original console implementation and experimental method. State this scope change in the final paper and confirm any required instructor approval.
+The original proposal excluded a graphical interface. The delivered application adds an optional local web interface while preserving the original console implementation and experimental method.
 
 The Words excluded statistic counts input units removed by word filters before phrase grouping. Numeric runs are counted separately as excluded units when numbers are disabled; minimum count only filters displayed results. These statistics are calculated outside the timed processing comparison.
