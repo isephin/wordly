@@ -1,6 +1,36 @@
-# Wordly — Word Frequency Analyzer
+# wordly.
 
-A local Python web and console application for analyzing written campus feedback and demonstrating parallel computing. The project uses deterministic counting, not an AI model.
+**Find meaning in repetition.**
+
+A local word frequency analyzer built for Parallel and Distributed Computing — Laboratory. Wordly analyzes text and documents, visualizes word counts, and compares actual sequential and parallel Python execution.
+
+![Wordly homepage](assets/readme/hero.png)
+
+## Features
+
+- Paste text, upload documents, or choose generated campus feedback datasets.
+- Filter common words, custom words, numbers, case, and word length; count individual words or phrases.
+- Explore a frequency curve, bubble map, word cloud, and frequency bars.
+- Search and sort word counts, inspect matching text, compare documents, and export results.
+- Measure sequential and parallel execution time, speedup, efficiency, and count agreement.
+
+## Preview
+
+### Input
+
+![Text input and sample dataset selection](assets/readme/input.png)
+
+### Frequency analysis
+
+![Frequency graph and word statistics](assets/readme/analysis-overview.png)
+
+### Word map
+
+![Frequency-scaled bubble chart](assets/readme/word-map.png)
+
+## Tech stack
+
+Python · Flask · HTML · CSS · JavaScript · `concurrent.futures.ProcessPoolExecutor`
 
 ## Setup
 
@@ -32,6 +62,15 @@ Requests are limited to 100 MiB, 10 uploaded files, 1.1 million nonempty lines a
 
 ## Performance methodology
 
+| Feedback entries | Mean sequential (s) | Mean parallel (s) | Speedup | Efficiency |
+|---:|---:|---:|---:|---:|
+| 1,000 | 0.001357 | 0.042623 | 0.0318× | 1.59% |
+| 10,000 | 0.012679 | 0.049510 | 0.2561× | 12.80% |
+| 100,000 | 0.132276 | 0.119661 | 1.1054× | 55.27% |
+| 1,000,000 | 1.325495 | 0.789387 | 1.6791× | 83.96% |
+
+![Recorded baseline benchmarks](assets/readme/benchmarks.png)
+
 The archived CSV files in `results/` are the original two-worker baseline, not timings of the configurable web engine. Four synthetic datasets (1,000; 10,000; 100,000; 1,000,000 lines) were tested in ten paired trials each, alternating execution order. Timing includes chunk creation, counting, process startup, transfer, merging and shutdown; excludes input reading, extraction, UI and output. Speedup = mean sequential time / mean parallel time; efficiency = speedup / worker count × 100%. Efficiency is not CPU utilization. All 40 paired trials agreed on complete frequency counters. Results are device- and workload-specific. Synthetic feedback uses a limited set of templates, not actual survey responses. No distributed machines are used. The web interface was added after the baseline experiment and has additional settings; live results are single-run measurements, not the archived averages.
 
 ## Tests
@@ -41,6 +80,7 @@ python test_advanced.py
 python test_final.py
 python test_reliability.py
 python test_web.py
+python test_word_statistics.py
 ```
 
 The last command requires Flask. Browser checks: analyze pasted text, sample data and files; verify counts and charts, comparison, downloads, history, keyboard controls and mobile layout. Do not treat syntax checks as browser tests.
