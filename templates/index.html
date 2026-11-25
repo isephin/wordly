@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>wordly.</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav>
+        <a class="logo" href="/">wordly<span>.</span></a>
+        <div class="nav-links">
+            <a href="#analyzer">Analyzer</a>
+            <a href="#benchmarks">Benchmarks</a>
+        </div>
+        <span class="system-status">● Local</span>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="eyebrow">PARALLEL AND DISTRIBUTED COMPUTING</div>
+             <h1>Find meaning<br>in <em>repetition.</em></h1>
+            
+
+            <div class="spectrum">
+                <div class="glow blue"></div>
+                <div class="glow purple"></div>
+                <div class="glow coral"></div>
+                <div class="glow yellow"></div>
+
+                <svg id="spectrum-visual" viewBox="0 0 900 260">
+                    <defs>
+                        <linearGradient id="gradient">
+                            <stop offset="0%" stop-color="#6ca3ef"/>
+                            <stop offset="35%" stop-color="#b995f5"/>
+                            <stop offset="70%" stop-color="#ef827a"/>
+                            <stop offset="100%" stop-color="#f1cf65"/>
+                        </linearGradient>
+                    </defs>
+
+                    <path class="wave"
+                        d="M65 130 C170 130 210 25 300 65 S420 220 510 115 S650 25 720 100 S790 160 835 130"/>
+                    <path class="wave second"
+                        d="M65 130 C180 130 210 235 300 195 S410 35 510 145 S650 235 720 160 S790 100 835 130"/>
+                    <path class="dotted"
+                        d="M65 130 C230 130 250 90 380 130 S650 170 835 130"/>
+
+                    <circle cx="65" cy="130" r="3"/>
+                    <circle cx="300" cy="65" r="3"/>
+                    <circle cx="510" cy="115" r="3"/>
+                    <circle cx="720" cy="160" r="3"/>
+                    <circle cx="835" cy="130" r="3"/>
+
+                    <text class="spectrum-word" x="65" y="115">input</text>
+                    <text class="spectrum-word" x="300" y="45">split</text>
+                    <text class="spectrum-word" x="510" y="95">count</text>
+                    <text class="spectrum-word" x="720" y="188">merge</text>
+                    <text class="spectrum-word" x="835" y="115">output</text>
+                </svg>
+            </div>
+
+            <div class="hero-caption">
+                
+            </div>
+        </section>
+
+        <section id="analyzer">
+            <div class="section-heading">
+                
+                <h2>Input</h2>
+                <p>Paste text, upload a file, or select a dataset.</p>
+            </div>
+
+            <div class="text-input">
+        <textarea id="plain-text"
+            placeholder="Type or paste your text here..."
+            aria-label="Text to analyze"></textarea>
+        <div class="text-toolbar">
+            <span id="text-count">0 characters</span>
+            <button id="clear-text" type="button">Clear</button>
+        </div>
+    </div>
+
+    <div class="input-divider">
+        <span>Sample datasets</span>
+    </div>
+
+    <p class="sample-note">Generated campus event feedback for testing performance.</p>
+    <div class="dataset-grid">
+                <button class="dataset active" data-value="small">
+                    <span>01 — SMALL</span>
+                    <strong>1,000</strong>
+                    <small>responses</small>
+                </button>
+                <button class="dataset" data-value="medium">
+                    <span>02 — MEDIUM</span>
+                    <strong>10,000</strong>
+                    <small>responses</small>
+                </button>
+                <button class="dataset" data-value="large">
+                    <span>03 — LARGE</span>
+                    <strong>100,000</strong>
+                    <small>responses</small>
+                </button>
+                <button class="dataset" data-value="extra_large">
+                    <span>04 — EXTRA LARGE</span>
+                    <strong>1,000,000</strong>
+                    <small>responses</small>
+                </button>
+            </div>
+
+            <div class="input-actions">
+                <label class="upload">
+                    <input type="file" id="file" accept=".txt,.md,.pdf,.docx,.csv,.xlsx,.json" multiple>
+                    <span id="file-label">＋ Upload files</span>
+                </label>
+                <button id="analyze" class="primary">
+                    Analyze ↗
+                </button>
+            </div>
+
+            <div id="columns"></div>
+<details class="advanced"><summary>Analysis settings</summary><div class="settings-grid">
+<label><input id="opt-stop" type="checkbox" checked> Ignore common words (the, is, and)</label>
+<label><input id="opt-case" type="checkbox"> Distinguish uppercase and lowercase</label>
+<label><input id="opt-numbers" type="checkbox"> Include numbers</label>
+<label><input id="opt-stem" type="checkbox"> Group word forms (running → run)</label>
+<label>Minimum word length <input id="opt-length" type="number" min="1" max="100" value="1"></label>
+<label>Minimum count to show <input id="opt-frequency" type="number" min="1" value="1"></label>
+<label>Analysis type <select id="opt-ngram"><option value="1">Words</option><option value="2">Two-word phrases</option><option value="3">Three-word phrases</option></select></label>
+<label>Parallel workers <select id="opt-workers"><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+<label>Exclude words <input id="opt-exclude" placeholder="event, seminar"></label>
+<label>Include only <input id="opt-include" placeholder="Leave blank for all"></label>
+</div><p>Phrases cannot cross lines or skipped words. Minimum count changes the displayed results, not the totals. Grouping word forms ignores case.</p><button id="reset-options" class="secondary">Reset settings</button></details>
+<p id="status" role="status"></p>
+        </section>
+
+        <section id="results" hidden>
+            <div class="section-heading">
+                
+                <h2>Word frequency</h2>
+                <p id="result-source"></p>
+            </div>
+
+            <div class="metrics">
+                <div>
+                    <span>Lines with text</span>
+                    <strong id="responses">—</strong>
+                </div>
+                <div>
+                    <span>Words counted</span>
+                    <strong id="total-words">—</strong>
+                </div>
+                <div>
+                    <span>Unique words</span>
+                    <strong id="unique-words">—</strong>
+                </div>
+            </div>
+
+            <div id="extra-stats" class="metrics"></div>
+<div class="tools"><label>Show <select id="top-limit"><option>5</option><option selected>10</option><option>20</option><option>50</option></select></label><button id="png-export" class="secondary">Save curve as PNG</button></div>
+<div class="visual-panel"><h3>Top five words or phrases</h3><p class="visual-note"></p><div id="result-spectrum"></div></div><div class="visual-panel"><h3>Word map</h3><div id="aura-view" class="aura-view"></div></div>
+
+    <div class="visual-panel"><h3>Word cloud</h3><div id="word-cloud" class="word-cloud"></div></div>
+
+            <h3 id="bars-heading">Most frequent words</h3>
+            <div id="word-bars"></div>
+
+            <h3>Frequency table</h3><div class="tools"><input id="word-search" placeholder="Search words"><select id="word-sort"><option value="desc">Most frequent</option><option value="asc">Least frequent</option><option value="alpha">Alphabetical</option></select><button id="csv-export" class="secondary">CSV</button><button id="json-export" class="secondary">JSON</button><button id="copy-export" class="secondary">Copy</button></div>
+<div class="table-wrapper"><table><thead><tr><th>Word / phrase</th><th>Count</th><th>Share</th></tr></thead><tbody id="frequency-table"></tbody></table></div><div class="tools"><button id="prev-page" class="secondary">Previous</button><span id="page-info"></span><button id="next-page" class="secondary">Next</button></div>
+<details class="advanced"><summary>Find words in the text</summary><div class="tools"><input id="context-search" placeholder="Search for a word or phrase"><button id="context-find" class="secondary">Find</button><select id="preview-mode"><option value="original">Original</option><option value="processed">After filters</option></select></div><p>Find exact counted words or phrases in the first 10,000 lines (up to 2,000 characters each). Shows up to 100 matching lines.</p><pre id="context-output"></pre></details>
+<div id="comparison"></div>
+<div class="section-heading performance-heading">
+                
+                <h2>Performance comparison</h2>
+                
+            </div>
+
+            <div class="metrics">
+                <div>
+                    <span>Speedup</span>
+                    <strong id="speedup">—</strong>
+                </div>
+                <div>
+                    <span>Parallel efficiency</span>
+                    <strong id="efficiency">—</strong>
+                </div>
+                <div>
+                    <span>Faster method</span>
+                    <strong id="winner">—</strong>
+                </div>
+            </div>
+
+            <div id="time-bars"></div>
+
+            <p id="explanation" class="explanation"></p>
+            <p id="verification"></p><p id="live-config"></p><details class="advanced"><summary>Recent analyses</summary><p>Only line counts, dates and speedup are saved in this browser.</p><div id="history"></div><button id="clear-history" class="secondary">Clear history</button></details>
+        </section>
+
+        <section id="benchmarks">
+            <div class="section-heading">
+                
+                <h2>Benchmarks</h2>
+                <p>Original baseline (analyzer.py) · 10 runs per dataset · 2 workers. The live analyzer uses separate configurable settings.</p>
+            </div>
+
+            <div id="benchmark-graph"></div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Responses</th>
+                            <th>Sequential</th>
+                            <th>Parallel</th>
+                            <th>Speedup</th>
+                            <th>Efficiency</th>
+                        </tr>
+                    </thead>
+                    <tbody id="benchmark-table"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <strong>wordly.</strong>
+        <span>Parallel & Distributed Computing · Final Project</span>
+    </footer>
+
+    <button id="back-to-top" type="button" aria-label="Back to top" title="Back to top" hidden><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    <script src="/static/app.js"></script>
+</body>
+</html>

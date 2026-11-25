@@ -1,0 +1,2 @@
+Timestamp,Dataset,Responses,Sequential Time (s),Parallel Time (s),Speedup,Efficiency (%),Identical Results
+2026-11-24T19:30:27,extra_large.txt,1000000,1.248018834,0.821507000,1.519182,75.9591,True

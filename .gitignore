@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.env.*
+backups/
+datasets/
+results/runs/
+*.zip
+update_ui.py
+update_visual.py

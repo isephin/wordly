@@ -1,0 +1,7 @@
+Python: 3.9.6 (default, May 22 2026, 11:13:45) 
+[Clang 21.0.0 (clang-2100.1.1.101)]
+OS: macOS-26.6.2-arm64-arm-64bit
+Architecture: arm64
+Logical CPUs: 14
+Parallel workers: 2
+Trials per dataset: 10
