@@ -2,43 +2,28 @@
 
 **Find meaning in repetition.**
 
-A local word frequency analyzer built for Parallel and Distributed Computing — Laboratory. Wordly analyzes text and documents, visualizes word counts, and compares actual sequential and parallel Python execution, with an optional network-based coordinator–worker mode. The research evaluation focuses on sequential and local parallel computing; the network mode is an optional extension tested on loopback only.
+A local word frequency analyzer built with Python and Flask for a Parallel and Distributed Computing laboratory project. Analyze text and documents, explore word frequencies, and compare sequential and parallel execution. An optional network mode connects to HTTP worker services.
 
 ![Wordly homepage](assets/readme/hero.png)
 
 ## Features
 
-- Paste text, upload documents, or choose generated campus feedback datasets.
-- Filter common words, custom words, numbers, case, and word length; count individual words or phrases.
-- Explore a frequency curve, bubble map, word cloud, and frequency bars.
-- Search and sort word counts, inspect matching text, compare documents, and export results.
-- Measure sequential and parallel execution time, speedup, efficiency, and count agreement.
-- Choose 2–14 local worker processes (subject to the host CPU limit), or use machine-specific benchmark-based automatic selection.
-- Compare local execution against authenticated HTTP worker services, with automatic batching and count verification.
+- Paste text, upload documents, or use generated campus feedback datasets.
+- Filter common words, custom words, numbers, case, and word length; count words or phrases.
+- View frequency curves, word maps, word clouds, bar charts, and searchable frequency tables.
+- Compare documents, find words in context, and export CSV, JSON, or a PNG of the frequency curve.
+- Compare actual execution times, speedup, efficiency, and word-count agreement.
+- Select 2–14 parallel processes, subject to the host's CPU limit, or use automatic worker selection.
+- Browse recorded benchmarks by worker count and access the original benchmark separately.
+- Connect to network workers through the optional Distributed page.
 
-## Preview
+## Getting started
 
-### Input
-
-![Text input and sample dataset selection](assets/readme/input.png)
-
-### Frequency analysis
-
-![Frequency graph and word statistics](assets/readme/analysis-overview.png)
-
-### Word map
-
-![Frequency-scaled bubble chart](assets/readme/word-map.png)
-
-## Tech stack
-
-Python · Flask · HTML · CSS · JavaScript · `concurrent.futures.ProcessPoolExecutor`
-
-## Setup
-
-Python 3.9 or later. From the project directory:
+Python 3.9 or later. The following commands are for macOS and Linux:
 
 ```sh
+git clone https://github.com/isephin/wordly.git
+cd wordly
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
@@ -46,42 +31,50 @@ python generate_dataset.py
 python app.py
 ```
 
-Open http://127.0.0.1:5000. The server is intended for local use only. For the original console application, run `python main.py`. Generate datasets only if they are missing; generation is reproducible with seed 42.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original console program is available with `python main.py`.
 
-## Implementation
+### Analyzer
 
-- `analyzer.py`: original two-worker baseline, ASCII word extraction, fixed stop-word list, Counter and ProcessPoolExecutor.
-- `benchmark.py`: original experiment, with future runs stored separately under `results/runs/`.
-- `advanced_analyzer.py`: configurable Unicode-aware analysis. Both methods use the same counting logic and merge chunk counters. Sequential runs use two chunks processed serially; parallel runs use the selected number of worker processes. Parallel runs use separate Python processes, not threads. Stemming and case sensitivity are mutually exclusive.
-- `file_reader.py`: extracts text from supported documents.
-- `app.py`: local Flask API; `templates/` and `static/` provide the interface.
-- `distributed.py`, `distributed_web.py`, `worker.py`: network task assignment, bounded JSON batches, remote counting and aggregation.
-- `benchmark_scaling.py`, `worker_policy.py`: supplementary scaling experiments and machine-specific calibration.
+Select a sample dataset, paste text, or upload files. Expand **Analysis settings** to change filters, phrase length, and parallel worker count. Click **Analyze** to run both sequential and parallel methods.
 
-## Usage and limitations
+![Input and dataset selection](assets/readme/input.png)
 
-Paste text, choose a sample dataset or upload up to ten files. TXT and Markdown use UTF-8; PDF requires extractable text (no OCR); DOCX reads paragraphs and tables; CSV and XLSX assume the first row contains headers, XLSX reads the active sheet and cached formula values; JSON reads string values, not keys or numeric values. Spreadsheet columns may be selected. Each nonempty line or cell is an independent unit. Word phrases do not cross lines or skipped words; punctuation is treated as a separator, not a sentence boundary. English stemming is not lemmatization. Minimum count only filters displayed/exported frequencies; statistics and correctness checks use the full counts. Context search matches exact counted words or phrases within the first 10,000 lines, truncated to 2,000 characters each, and returns at most 100 lines. The PNG export saves the frequency curve; CSV exports the searched/sorted table, JSON exports the result list. Recent history stores dates, line counts and speedup locally, not document text.
+![Word frequency results](assets/readme/analysis-overview.png)
 
-Requests are limited to 100 MiB, 10 uploaded files, 1.1 million nonempty lines and 60 million extracted characters. ZIP-based documents have an additional 150 MiB uncompressed size check. These are practical limits, not a guarantee against resource exhaustion; use trusted local files. No public deployment is intended.
+<details>
+<summary>Word map</summary>
 
-## Performance methodology
+![Word map](assets/readme/word-map.png)
 
-| Feedback entries | Mean sequential (s) | Mean parallel (s) | Speedup | Efficiency |
-|---:|---:|---:|---:|---:|
-| 1,000 | 0.001357 | 0.042623 | 0.0318× | 1.59% |
-| 10,000 | 0.012679 | 0.049510 | 0.2561× | 12.80% |
-| 100,000 | 0.132276 | 0.119661 | 1.1054× | 55.27% |
-| 1,000,000 | 1.325495 | 0.789387 | 1.6791× | 83.96% |
+</details>
 
-![Recorded baseline benchmarks](assets/readme/benchmarks.png)
+Supported formats: TXT, Markdown, PDF (selectable text), DOCX, CSV, XLSX, and JSON. Up to ten files can be uploaded at a time.
 
-The archived CSV files in `results/` are the original two-worker baseline, not timings of the configurable web engine. Four synthetic datasets (1,000; 10,000; 100,000; 1,000,000 lines) were tested in ten paired trials each, alternating execution order. Timing includes chunk creation, counting, process startup, transfer, merging and shutdown; excludes input reading, extraction, UI and output. Speedup = mean sequential time / mean parallel time; efficiency = speedup / worker count × 100%. Efficiency is not CPU utilization. All 40 paired trials agreed on complete frequency counters. Results are device- and workload-specific. Synthetic feedback uses a limited set of templates, not actual survey responses. No distributed machines were used in this original baseline experiment. The web interface was added after the baseline experiment and has additional settings; live results are single-run measurements, not the archived averages.
+## Benchmarks
 
-## Supplementary scaling experiment (v3.3)
+The current Analyzer uses the configurable word-counting engine. The Benchmarks section displays recorded averages for sequential execution and 2, 4, 6, 8, 10, 12, or 14 parallel processes. Select a worker count or **Best parallel time** to compare the fastest recorded parallel configuration for each dataset.
 
-Eight trials per configuration, rotating execution order, on an Apple M4 Pro with 14 logical CPUs. The configurable analysis engine was used with default filters; these measurements are separate from the original baseline.
+![Current benchmark graphs](assets/readme/benchmarks.png)
 
-| Workers | 1,000 (s) | 10,000 (s) | 100,000 (s) | 1,000,000 (s) |
+### Current analyzer results
+
+Apple M4 Pro · 14 logical CPUs · 24 GB RAM · Python 3.9.6 · 8 trials per configuration · default filters.
+
+| Responses | Workers | Sequential (s) | Parallel (s) | Speedup | Efficiency |
+|---:|---:|---:|---:|---:|---:|
+| 1,000 | 2 | 0.003198 | 0.059823 | 0.053× | 2.67% |
+| 10,000 | 4 | 0.031148 | 0.071960 | 0.433× | 10.82% |
+| 100,000 | 8 | 0.316939 | 0.121275 | 2.613× | 32.67% |
+| 1,000,000 | 12 | 3.116655 | 0.489161 | 6.371× | 53.10% |
+
+Sequential execution was faster on the two smaller datasets. At one million responses, 12 workers achieved the lowest recorded mean time, about 6.37× faster than sequential execution. The 14-worker result (0.489337 s) was nearly identical. All 256 timed measurements matched the reference word counts.
+
+<details>
+<summary>Full scaling results and benchmark table</summary>
+
+Mean execution time in seconds:
+
+| Workers | 1,000 | 10,000 | 100,000 | 1,000,000 |
 |---:|---:|---:|---:|---:|
 | Sequential | 0.003198 | 0.031148 | 0.316939 | 3.116655 |
 | 2 | 0.059823 | 0.075488 | 0.225166 | 1.758814 |
@@ -92,21 +85,111 @@ Eight trials per configuration, rotating execution order, on an Apple M4 Pro wit
 | 12 | 0.102038 | 0.102764 | 0.144936 | 0.489161 |
 | 14 | 0.119322 | 0.119899 | 0.152439 | 0.489337 |
 
-Twelve workers achieved the lowest measured mean time on one million responses (0.489161 s, 6.37× speedup); fourteen workers were effectively tied (0.489337 s). Sequential execution was fastest for the two smaller datasets. The automatic option selects the fastest measured *parallel* configuration for a nearby sample size and reports when sequential was faster. Both methods still execute for comparison. Calibration is specific to the host and default filters, not a general optimization guarantee.
+![Current benchmark table](assets/readme/benchmark-table.png)
 
-See [supplementary benchmark data](results/published/README.md). To calibrate your own machine, choose worker counts appropriate to its CPU limit:
+</details>
+
+[Scaling data and methodology](results/published/README.md) · [Trial results](results/published/scaling_v3_3_raw.csv) · [Summary](results/published/scaling_v3_3_summary.csv)
+
+The datasets contain synthetic campus event feedback generated from a limited set of templates using seed 42. The experiment rotates execution order and starts a fresh process pool for each parallel run. Timing includes chunk creation, counting, process coordination and merging; file reading, text extraction and visualizations are excluded. Speedup is mean sequential time divided by mean parallel time. Efficiency is speedup divided by worker count × 100%; it is not CPU utilization.
+
+The published scaling CSVs were reconstructed from console timings rounded to six decimal places. Derived values may differ slightly from the original full-precision local CSVs. Live analysis times are single-run measurements and will vary by machine, workload and filters.
+
+<details>
+<summary>Original two-worker benchmark</summary>
+
+The initial experiment used the simpler counting engine in `analyzer.py`, with ten paired trials per dataset and alternating execution order. All 40 pairs returned identical word counts. These results are retained separately because the two engines use different preprocessing implementations.
+
+| Responses | Sequential (s) | Parallel (s) | Speedup | Efficiency |
+|---:|---:|---:|---:|---:|
+| 1,000 | 0.001357 | 0.042623 | 0.0318× | 1.59% |
+| 10,000 | 0.012679 | 0.049510 | 0.2561× | 12.80% |
+| 100,000 | 0.132276 | 0.119661 | 1.1054× | 55.27% |
+| 1,000,000 | 1.325495 | 0.789387 | 1.6791× | 83.96% |
+
+![Original benchmark archive](assets/readme/original-benchmark.png)
+
+[Original benchmark summary](results/benchmark_summary.csv)
+
+</details>
+
+### Automatic worker selection
+
+Automatic uses the fastest measured parallel configuration for the nearest sample size in a matching local calibration profile. It still runs both sequential and parallel processing. Without a matching profile, it uses two workers.
+
+To generate a profile for your own computer (optional):
 
 ```sh
 python benchmark_scaling.py --trials 8 --calibrate
 ```
 
-## Network processing
+Calibration is specific to the machine and default filters. It does not guarantee the fastest configuration for every input.
 
-The coordinator partitions nonempty input lines among configured worker endpoints and sends batches of up to 4 MiB of JSON. Each worker independently counts words and returns a counter; the coordinator merges these counters and compares them with sequential and local parallel results. Requests are authenticated with a shared token, but HTTP is not encrypted.
+## Distributed processing
 
-Local loopback tests passed at all four sample sizes (the million-line test passed after batching, using 14 requests across two worker services). These services ran on one physical Mac. This validates network communication and aggregation, not physical multi-computer performance. Physical multi-device testing and formal distributed benchmarking are outside the current project scope.
+The optional Distributed page compares sequential, local parallel, and network-based counting. The coordinator splits input lines into batches, sends them to worker services, and merges the returned counters. Requests use a shared token. The coordinator checks whether all three methods produce identical counts.
 
-For optional future work, see [worker setup and benchmark procedure](docs/distributed-testing.md). Do not expose worker ports to the public internet or transmit sensitive text.
+![Distributed page before worker setup](assets/readme/distributed.png)
+
+### Local worker setup
+
+Open three terminals in the project folder. Use the virtual environment and dependencies installed above. Stop any existing Wordly server before starting the coordinator.
+
+**Terminal 1 — Worker 1**
+
+```sh
+source .venv/bin/activate
+export WORDLY_TOKEN="wordly-local-demo-test-secret"
+python worker.py --host 127.0.0.1 --port 8765
+```
+
+**Terminal 2 — Worker 2**
+
+```sh
+source .venv/bin/activate
+export WORDLY_TOKEN="wordly-local-demo-test-secret"
+python worker.py --host 127.0.0.1 --port 8766
+```
+
+**Terminal 3 — Coordinator**
+
+```sh
+source .venv/bin/activate
+export WORDLY_TOKEN="wordly-local-demo-test-secret"
+export WORDLY_WORKERS="http://127.0.0.1:8765,http://127.0.0.1:8766"
+python app.py
+```
+
+Open [http://127.0.0.1:5000/distributed](http://127.0.0.1:5000/distributed), click **Check connections**, and confirm both workers are online. Select a sample dataset and click **Analyze**. If a worker is offline, check its port, token, and terminal. Stop the services with `Ctrl+C` when finished.
+
+Network processing was tested using two worker services on one physical Mac (loopback), including a million-line workload. This validates HTTP communication and aggregation, not performance across physical computers. The formal evaluation focuses on local parallel processing. Network workers are already running when timed, unlike fresh local process pools.
+
+The example token is for loopback testing only. For a trusted LAN, use a private shared token. HTTP is not encrypted; do not send sensitive text or expose worker ports publicly. [Optional LAN setup](docs/distributed-testing.md).
+
+## Implementation
+
+Python · Flask · HTML · CSS · JavaScript · `concurrent.futures.ProcessPoolExecutor` · `collections.Counter`
+
+| File | Purpose |
+|---|---|
+| `analyzer.py`, `main.py` | Original two-worker analyzer and console program |
+| `advanced_analyzer.py` | Configurable Unicode-aware counting and filters |
+| `file_reader.py` | Document text extraction |
+| `app.py`, `templates/`, `static/` | Flask API and browser interface |
+| `generate_dataset.py` | Reproducible sample datasets |
+| `benchmark.py` | Original benchmark |
+| `benchmark_scaling.py`, `worker_policy.py` | Worker scaling and local calibration |
+| `distributed.py`, `distributed_web.py`, `worker.py` | HTTP worker communication and count aggregation |
+
+Both local methods use the same counting logic. Sequential processes two chunks serially; parallel splits the workload according to the selected worker count and uses separate Python processes. Partial counters are merged into the final frequencies.
+
+## Limits and behavior
+
+- Requests: 100 MiB, up to 10 files, 1.1 million nonempty lines, and 60 million extracted characters. ZIP-based documents have an additional 150 MiB uncompressed size check. Use trusted local files.
+- PDF requires extractable text (no OCR). DOCX reads paragraphs and tables. CSV and XLSX use the first row as headers; XLSX reads the active sheet and cached formula values. JSON reads string values.
+- Phrases do not cross lines or skipped words. Stemming and case sensitivity cannot be combined. Minimum count filters displayed/exported frequencies, not the total counts.
+- Keyword context covers the first 10,000 lines, up to 2,000 characters per line and 100 matches. Recent analysis history stores dates, line counts, and speedup in the browser, not document text.
+- CSV exports the searched/sorted table; JSON exports the result list; PNG exports the frequency curve. The excluded-word count includes units removed by word filters before phrase grouping, including disabled numeric runs.
 
 ## Tests
 
@@ -121,10 +204,4 @@ python test_batching.py
 python test_worker_policy.py
 ```
 
-The web test requires Flask. Browser checks: analyze pasted text, sample data and files; verify counts and charts, comparison, downloads, history, keyboard controls and mobile layout. Do not treat syntax checks as browser tests.
-
-## Final documentation note
-
-The original proposal excluded a graphical interface. The delivered application adds an optional local web interface and an experimental network processing mode while preserving the original console implementation and experimental method. State this scope change in the final paper and confirm any required instructor approval.
-
-The Words excluded statistic counts input units removed by word filters before phrase grouping. Numeric runs are counted separately as excluded units when numbers are disabled; minimum count only filters displayed results. These statistics are calculated outside the timed processing comparison.
+The web test requires Flask. Browser checks include uploads, filters, charts, exports, benchmark display, and worker setup.
