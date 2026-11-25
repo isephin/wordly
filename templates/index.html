@@ -13,6 +13,7 @@
         <div class="nav-links">
             <a href="#analyzer">Analyzer</a>
             <a href="#benchmarks">Benchmarks</a>
+            <a href="/distributed">Distributed</a>
         </div>
         <span class="system-status">● Local</span>
     </nav>
@@ -129,7 +130,7 @@
 <label>Minimum word length <input id="opt-length" type="number" min="1" max="100" value="1"></label>
 <label>Minimum count to show <input id="opt-frequency" type="number" min="1" value="1"></label>
 <label>Analysis type <select id="opt-ngram"><option value="1">Words</option><option value="2">Two-word phrases</option><option value="3">Three-word phrases</option></select></label>
-<label>Parallel workers <select id="opt-workers"><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option></select></label>
+<label>Parallel workers <select id="opt-workers"><option value="auto">Automatic</option>{% for n in range(2, worker_limit+1) %}<option{% if n == 2 %} selected{% endif %}>{{ n }}</option>{% endfor %}</select></label>
 <label>Exclude words <input id="opt-exclude" placeholder="event, seminar"></label>
 <label>Include only <input id="opt-include" placeholder="Leave blank for all"></label>
 </div><p>Phrases cannot cross lines or skipped words. Minimum count changes the displayed results, not the totals. Grouping word forms ignores case.</p><button id="reset-options" class="secondary">Reset settings</button></details>
