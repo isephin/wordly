@@ -106,6 +106,15 @@ def benchmarks():
         return jsonify(list(csv.DictReader(file)))
 
 
+@app.get("/api/benchmarks/scaling")
+def scaling_benchmarks():
+    path = BASE / "results" / "published" / "scaling_v3_3_summary.csv"
+    if not path.exists():
+        return jsonify([])
+    with path.open(encoding="utf-8", newline="") as file:
+        return jsonify(list(csv.DictReader(file)))
+
+
 if __name__ == "__main__":
     app.run(
         host="127.0.0.1",

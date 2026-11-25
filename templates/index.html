@@ -203,7 +203,15 @@
             <div class="section-heading">
                 
                 <h2>Benchmarks</h2>
-                <p>Original baseline (analyzer.py) · 10 runs per dataset · 2 workers. The live analyzer uses separate configurable settings.</p>
+                <p>Sequential vs. parallel · 8 trials per configuration</p>
+            </div>
+            <p>Recorded on an Apple M4 Pro (14 logical CPUs) using generated campus feedback and default filters. File reading and charts are not timed.</p>
+            <div class="tools"><label for="scaling-workers">Parallel workers <select id="scaling-workers" disabled><option value="best">Best parallel time</option></select></label></div>
+            <p id="scaling-note" role="status">Loading recorded results…</p>
+            <div id="scaling-graph"></div>
+            <div class="table-wrapper"><table><thead><tr><th>Responses</th><th>Workers</th><th>Sequential</th><th>Parallel</th><th>Speedup</th><th>Efficiency</th></tr></thead><tbody id="scaling-table"></tbody></table></div>
+            <details class="advanced"><summary>Original benchmark</summary>
+            <div class="section-heading"><p>Original analyzer · 2 workers · 10 paired trials per dataset. Uses a different counting engine.</p>
             </div>
 
             <div id="benchmark-graph"></div>
@@ -222,6 +230,7 @@
                     <tbody id="benchmark-table"></tbody>
                 </table>
             </div>
+            </details>
         </section>
     </main>
 
@@ -232,5 +241,6 @@
 
     <button id="back-to-top" type="button" aria-label="Back to top" title="Back to top" hidden><svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
     <script src="/static/app.js"></script>
+    <script src="/static/scaling-benchmarks.js"></script>
 </body>
 </html>
