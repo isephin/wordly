@@ -4,6 +4,8 @@
 
 A local word frequency analyzer built with Python and Flask for a Parallel and Distributed Computing laboratory project. Analyze text and documents, explore word frequencies, and compare sequential and parallel execution. An optional network mode connects to HTTP worker services.
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/19YIUV5Y_YhuQiUBJDTYMpR3F6L6rkIcX)
+
 ![Wordly homepage](assets/readme/hero.png)
 
 ## Features
@@ -48,6 +50,8 @@ python app.py
 Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original baseline console program is available with `python -m research.baseline_console`.
 
 ### Standalone console
+
+The console version is also available on [Google Colab](https://colab.research.google.com/drive/19YIUV5Y_YhuQiUBJDTYMpR3F6L6rkIcX) without local installation.
 
 Run `python wordly_console.py` for the final numbered console interface. It uses the same counting engine and default filters as the web application, generates sample datasets in memory, and compares live sequential and parallel execution. Choose a dataset, paste text, or enter a document path. Worker selection is manual. Graphs are saved in `wordly_results/` (Matplotlib required).
 
