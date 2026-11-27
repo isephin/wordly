@@ -1,6 +1,5 @@
 # wordly. - Word Frequency Analyzer
 # PDC final project: Cinco, Estorninos, Guevarra (BCS44)
-# Both methods count the same input. Only the way work is assigned differs.
 
 # Standard library tools for text processing, files, and sample generation.
 import os
