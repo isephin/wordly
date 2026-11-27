@@ -6,7 +6,7 @@ Use three computers on a trusted private LAN: one coordinator, two remote worker
 
 ## Worker setup
 
-Install Python 3.9 or later and the project dependencies in a virtual environment. On each worker, set `WORDLY_TOKEN` to the shared token in its terminal environment. Then run `python worker.py --host 0.0.0.0 --port 8765`. Allow connections only on the trusted private network. Record each worker's LAN IPv4 address privately.
+Install Python 3.9 or later and the project dependencies in a virtual environment. On each worker, set `WORDLY_TOKEN` to the shared token in its terminal environment. Then run `python -m distributed.worker --host 0.0.0.0 --port 8765`. Allow connections only on the trusted private network. Record each worker's LAN IPv4 address privately.
 
 ## Coordinator setup
 
@@ -17,7 +17,7 @@ Set the same `WORDLY_TOKEN` and set `WORDLY_WORKERS` to the two actual HTTP work
 Stop other heavy work on all devices. Use default filters and document hardware, Python version, network type, and date. With the same environment variables and the worker servers still running, run:
 
 ```sh
-python benchmark_scaling.py --workers 2 --trials 9 --network
+python -m research.benchmark_scaling --workers 2 --trials 9 --network
 ```
 
 This tests sequential, local parallel (two processes), and distributed (two network workers), rotating execution order. Each dataset has nine measurements per method. Record mean time and speedup; do not equate distributed speedup per worker with CPU utilization. The local process pool starts for every trial, while network servers are already running; this asymmetry must be disclosed. Compare complete counters, not only top words. Archive the original CSVs privately, then remove network addresses and machine identifiers from public copies. Do not substitute loopback timings for physical distributed benchmarks. Stop the worker services after the experiment.

@@ -1,5 +1,5 @@
-from advanced_analyzer import options,run,terms
-from file_reader import extract
+from core.advanced_analyzer import options,run,terms
+from core.file_reader import extract
 from io import BytesIO
 from docx import Document
 from openpyxl import Workbook

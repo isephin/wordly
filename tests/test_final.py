@@ -1,7 +1,7 @@
 import json
-from advanced_analyzer import options,run,terms,tokens
+from core.advanced_analyzer import options,run,terms,tokens
 from pathlib import Path
-from file_reader import extract
+from core.file_reader import extract
 
 from io import BytesIO
 

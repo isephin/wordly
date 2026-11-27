@@ -1,8 +1,8 @@
 import threading
 from http.server import HTTPServer
-from advanced_analyzer import options,count_chunk
-import distributed
-from worker import Handler
+from core.advanced_analyzer import options,count_chunk
+from distributed import distributed
+from distributed.worker import Handler
 
 def main():
     servers=[]; token='test-secret-not-for-real-use-123'

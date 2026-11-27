@@ -4,9 +4,9 @@ from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import get_context
 from time import perf_counter
-from analyzer import STOP_WORDS
+from core.analyzer import STOP_WORDS
 from functools import lru_cache
-from worker_policy import worker_limit
+from core.worker_policy import worker_limit
 
 @lru_cache(maxsize=1)
 def stemmer():

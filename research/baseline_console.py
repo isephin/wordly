@@ -2,14 +2,14 @@ import csv
 from pathlib import Path
 from datetime import datetime
 
-from analyzer import (
+from core.analyzer import (
     sequential_analysis,
     parallel_analysis,
     calculate_metrics,
     get_top_words
 )
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 DATASET_DIR = BASE_DIR / "datasets"
 RESULTS_DIR = BASE_DIR / "results"
 

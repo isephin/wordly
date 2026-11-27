@@ -27,11 +27,11 @@ cd wordly
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python generate_dataset.py
+python -m research.generate_dataset
 python app.py
 ```
 
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original baseline console program is available with `python main.py`.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original baseline console program is available with `python -m research.baseline_console`.
 
 ### Standalone console
 
@@ -104,7 +104,7 @@ The published scaling CSVs were reconstructed from console timings rounded to si
 <details>
 <summary>Original two-worker benchmark</summary>
 
-The initial experiment used the simpler counting engine in `analyzer.py`, with ten paired trials per dataset and alternating execution order. All 40 pairs returned identical word counts. These results are retained separately because the two engines use different preprocessing implementations.
+The initial experiment used the simpler counting engine in `core/analyzer.py`, with ten paired trials per dataset and alternating execution order. All 40 pairs returned identical word counts. These results are retained separately because the two engines use different preprocessing implementations.
 
 | Responses | Sequential (s) | Parallel (s) | Speedup | Efficiency |
 |---:|---:|---:|---:|---:|
@@ -126,7 +126,7 @@ Automatic uses the fastest measured parallel configuration for the nearest sampl
 To generate a profile for your own computer (optional):
 
 ```sh
-python benchmark_scaling.py --trials 8 --calibrate
+python -m research.benchmark_scaling --trials 8 --calibrate
 ```
 
 Calibration is specific to the machine and default filters. It does not guarantee the fastest configuration for every input.
@@ -146,7 +146,7 @@ Open three terminals in the project folder. Use the virtual environment and depe
 ```sh
 source .venv/bin/activate
 export WORDLY_TOKEN="wordly-local-demo-test-secret"
-python worker.py --host 127.0.0.1 --port 8765
+python -m distributed.worker --host 127.0.0.1 --port 8765
 ```
 
 **Terminal 2 — Worker 2**
@@ -154,7 +154,7 @@ python worker.py --host 127.0.0.1 --port 8765
 ```sh
 source .venv/bin/activate
 export WORDLY_TOKEN="wordly-local-demo-test-secret"
-python worker.py --host 127.0.0.1 --port 8766
+python -m distributed.worker --host 127.0.0.1 --port 8766
 ```
 
 **Terminal 3 — Coordinator**
@@ -179,14 +179,14 @@ Python · Flask · HTML · CSS · JavaScript · `concurrent.futures.ProcessPoolE
 | File | Purpose |
 |---|---|
 | `wordly_console.py` | Final standalone console application |
-| `analyzer.py`, `main.py` | Original two-worker analyzer and console program |
-| `advanced_analyzer.py` | Configurable Unicode-aware counting and filters |
-| `file_reader.py` | Document text extraction |
+| `core/analyzer.py`, `research/baseline_console.py` | Original two-worker analyzer and console program |
+| `core/advanced_analyzer.py` | Configurable Unicode-aware counting and filters |
+| `core/file_reader.py` | Document text extraction |
 | `app.py`, `templates/`, `static/` | Flask API and browser interface |
-| `generate_dataset.py` | Reproducible sample datasets |
-| `benchmark.py` | Original benchmark |
-| `benchmark_scaling.py`, `worker_policy.py` | Worker scaling and local calibration |
-| `distributed.py`, `distributed_web.py`, `worker.py` | HTTP worker communication and count aggregation |
+| `research/generate_dataset.py` | Reproducible sample datasets |
+| `research/benchmark.py` | Original benchmark |
+| `research/benchmark_scaling.py`, `core/worker_policy.py` | Worker scaling and local calibration |
+| `distributed/distributed.py`, `distributed/distributed_web.py`, `distributed/worker.py` | HTTP worker communication and count aggregation |
 
 Both local methods use the same counting logic. Sequential processes two chunks serially; parallel splits the workload according to the selected worker count and uses separate Python processes. Partial counters are merged into the final frequencies.
 
@@ -201,14 +201,14 @@ Both local methods use the same counting logic. Sequential processes two chunks 
 ## Tests
 
 ```sh
-python test_advanced.py
-python test_final.py
-python test_reliability.py
-python test_web.py
-python test_word_statistics.py
-python test_distributed.py
-python test_batching.py
-python test_worker_policy.py
+python -m tests.test_advanced
+python -m tests.test_final
+python -m tests.test_reliability
+python -m tests.test_web
+python -m tests.test_word_statistics
+python -m tests.test_distributed
+python -m tests.test_batching
+python -m tests.test_worker_policy
 ```
 
 The web test requires Flask. Browser checks include uploads, filters, charts, exports, benchmark display, and worker setup.

@@ -2,9 +2,9 @@ import threading
 from collections import Counter
 from http.server import HTTPServer
 from urllib.error import HTTPError
-from advanced_analyzer import options, count_chunk
-from distributed import distributed_run, call
-from worker import Handler
+from core.advanced_analyzer import options, count_chunk
+from distributed.distributed import distributed_run, call
+from distributed.worker import Handler
 
 def main():
     servers=[]; token='test-secret-not-for-real-use-123'

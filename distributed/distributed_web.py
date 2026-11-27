@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, render_template, request
-from advanced_analyzer import options, run
-from distributed import configuration, distributed_run, call
+from core.advanced_analyzer import options, run
+from distributed.distributed import configuration, distributed_run, call
 from pathlib import Path
-from worker_policy import worker_limit, select_workers
+from core.worker_policy import worker_limit, select_workers
 
 bp=Blueprint('distributed',__name__)
 @bp.get('/distributed')
@@ -25,7 +25,7 @@ def analyze():
         dataset=data.get('dataset',''); plain=data.get('text','')
         if plain.strip(): lines=plain.splitlines()
         elif dataset in ('small','medium','large','extra_large'):
-            lines=(Path(__file__).resolve().parent/'datasets'/ (dataset+'.txt')).read_text(encoding='utf-8').splitlines()
+            lines=(Path(__file__).resolve().parent.parent/'datasets'/ (dataset+'.txt')).read_text(encoding='utf-8').splitlines()
         else: raise ValueError('Choose text or a sample dataset.')
         lines=[x for x in lines if x.strip()]
         n, selection=select_workers(len(lines),data.get('local_workers',len(urls)))

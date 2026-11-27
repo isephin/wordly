@@ -6,14 +6,14 @@ from datetime import datetime
 from pathlib import Path
 from statistics import mean, median, stdev
 
-from analyzer import (
+from core.analyzer import (
     sequential_analysis,
     parallel_analysis,
     calculate_metrics,
     get_top_words
 )
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = BASE_DIR / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 

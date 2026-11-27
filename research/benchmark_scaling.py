@@ -3,9 +3,9 @@ import argparse, csv, os, platform, sys
 from datetime import datetime
 from pathlib import Path
 from statistics import mean
-from advanced_analyzer import options, run
-from distributed import configuration, distributed_run
-from worker_policy import worker_limit, save_profile, SIZES
+from core.advanced_analyzer import options, run
+from distributed.distributed import configuration, distributed_run
+from core.worker_policy import worker_limit, save_profile, SIZES
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--workers',nargs='+',type=int,default=[n for n in (2,4,6,8,10,12,14) if n<=worker_limit()]); p.add_argument('--trials',type=int,default=5); p.add_argument('--datasets',nargs='+',choices=['small','medium','large','extra_large'],default=['small','medium','large','extra_large']); p.add_argument('--network',action='store_true'); p.add_argument('--calibrate',action='store_true'); a=p.parse_args()
@@ -14,7 +14,7 @@ def main():
     urls,token=configuration() if a.network else ([],None)
     if a.network and len(urls) not in a.workers: p.error('Include the network worker count in --workers for a matched-count comparison.')
     methods=['sequential']+[f'parallel_{n}' for n in a.workers]+(['network'] if a.network else [])
-    root=Path(__file__).resolve().parent; out=root/'results'/'runs'/('scaling-'+datetime.now().strftime('%Y%m%d-%H%M%S-%f')); out.mkdir(parents=True)
+    root=Path(__file__).resolve().parent.parent; out=root/'results'/'runs'/('scaling-'+datetime.now().strftime('%Y%m%d-%H%M%S-%f')); out.mkdir(parents=True)
     (out/'environment.txt').write_text(f'{platform.platform()}\nPython {sys.version}\nLogical CPUs: {os.cpu_count()}\nNetwork addresses: {urls}\nTrials: {a.trials}\nRotating execution order; each parallel run starts a fresh pool; network workers already running.\n')
     raw=[]; summary=[]
     with (out/'raw.csv').open('w',newline='') as f:

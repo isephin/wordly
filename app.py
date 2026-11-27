@@ -1,9 +1,9 @@
 import csv
 import json
 from threading import Lock
-from advanced_analyzer import options, run, terms, word_statistics
-from worker_policy import worker_limit, select_workers
-from file_reader import extract
+from core.advanced_analyzer import options, run, terms, word_statistics
+from core.worker_policy import worker_limit, select_workers
+from core.file_reader import extract
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify
@@ -14,7 +14,7 @@ app.config["MAX_FORM_MEMORY_SIZE"] = 100 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 app.config["MAX_FORM_PARTS"] = 100
 ANALYSIS_LOCK = Lock()
-from distributed_web import bp as distributed_bp
+from distributed.distributed_web import bp as distributed_bp
 app.config["WORDLY_ANALYSIS_LOCK"] = ANALYSIS_LOCK
 app.register_blueprint(distributed_bp)
 MAX_LINES = 1_100_000

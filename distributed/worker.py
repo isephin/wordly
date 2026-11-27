@@ -1,9 +1,9 @@
-"""Run on each trusted LAN machine: python worker.py --port 8765."""
+"""Run on each trusted LAN machine: python -m distributed.worker --port 8765."""
 import argparse, hmac, json, os, socket
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from time import perf_counter
-from advanced_analyzer import count_chunk, options
-from distributed import MAX_BYTES
+from core.advanced_analyzer import count_chunk, options
+from distributed.distributed import MAX_BYTES
 
 class Handler(BaseHTTPRequestHandler):
     def reply(self, status, data):

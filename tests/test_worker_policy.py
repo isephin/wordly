@@ -1,7 +1,7 @@
 from tempfile import TemporaryDirectory
 from pathlib import Path
-from worker_policy import select_workers, save_profile, worker_limit, SIZES
-from advanced_analyzer import options, run
+from core.worker_policy import select_workers, save_profile, worker_limit, SIZES
+from core.advanced_analyzer import options, run
 
 def main():
     with TemporaryDirectory() as tmp:

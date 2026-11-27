@@ -1,4 +1,4 @@
-from analyzer import (
+from core.analyzer import (
     sequential_analysis,
     parallel_analysis,
     calculate_metrics,

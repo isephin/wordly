@@ -2,7 +2,7 @@
 import json, math, os, platform, sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 PROFILE = ROOT / 'results' / 'runs' / 'worker_profile.json'
 SIZES = ('small', 'medium', 'large', 'extra_large')
 

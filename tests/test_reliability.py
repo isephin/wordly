@@ -1,5 +1,5 @@
-from advanced_analyzer import options, run
-from file_reader import extract
+from core.advanced_analyzer import options, run
+from core.file_reader import extract
 from io import BytesIO
 from zipfile import ZipFile
 import csv
@@ -21,7 +21,7 @@ def main():
         b, _ = run(['Apple apple pear', 'banana'], opt, True)
         assert a == b == {'apple': 2, 'pear': 1, 'banana': 1}
     assert extract('x.csv', b'name,comment\na,apple\nb,pear', '1')[0] == ['apple', 'pear']
-    root = Path(__file__).resolve().parent / 'results'
+    root = Path(__file__).resolve().parent.parent / 'results'
     with (root / 'benchmark_raw.csv').open() as f:
         raw = list(csv.DictReader(f))
     with (root / 'benchmark_summary.csv').open() as f:

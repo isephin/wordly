@@ -1,4 +1,4 @@
-from advanced_analyzer import options, run, word_statistics
+from core.advanced_analyzer import options, run, word_statistics
 
 
 def main():

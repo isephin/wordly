@@ -3,7 +3,7 @@ from pathlib import Path
 
 random.seed(42)
 
-DATASET_DIR = Path(__file__).resolve().parent / "datasets"
+DATASET_DIR = Path(__file__).resolve().parent.parent / "datasets"
 DATASET_DIR.mkdir(exist_ok=True)
 
 positive = [

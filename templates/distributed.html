@@ -2,13 +2,13 @@
 <section class="hero dist-hero"><div class="eyebrow">PARALLEL AND DISTRIBUTED COMPUTING</div><h1>Distributed<br><em>processing.</em></h1><p>Compare word counting on this computer and across network workers.</p><div class="topology"><div class="node coordinator"><span>COORDINATOR</span><strong>This computer</strong><small>Splits data and combines counts</small></div><div class="connector" aria-hidden="true"></div><div id="workers" class="worker-grid" aria-live="polite"><p>No workers connected.</p></div></div><div class="dist-actions"><button class="secondary-dist" id="check">Check connections ↗</button><p id="network-note" role="status">Start workers to connect.</p></div>
 <details class="advanced" id="worker-setup" style="text-align:left;max-width:850px;margin:24px auto"><summary>Worker setup</summary>
 <p>For a local demo, run two workers on the same computer. No other devices are needed. This tests HTTP communication, not performance across separate computers. The Analyzer works without workers.</p>
-<p>Open three terminals in the Wordly project folder. Install the project dependencies first. If sample data is missing, run <code>python generate_dataset.py</code>.</p>
+<p>Open three terminals in the Wordly project folder. Install the project dependencies first. If sample data is missing, run <code>python -m research.generate_dataset</code>.</p>
 <h3>1. Start worker 1</h3><pre class="setup-code">source .venv/bin/activate
 export WORDLY_TOKEN="wordly-local-demo-test-secret"
-python worker.py --host 127.0.0.1 --port 8765</pre>
+python -m distributed.worker --host 127.0.0.1 --port 8765</pre>
 <h3>2. Start worker 2</h3><pre class="setup-code">source .venv/bin/activate
 export WORDLY_TOKEN="wordly-local-demo-test-secret"
-python worker.py --host 127.0.0.1 --port 8766</pre>
+python -m distributed.worker --host 127.0.0.1 --port 8766</pre>
 <h3>3. Start Wordly</h3><p>Stop Wordly with Control + C first.</p><pre class="setup-code">source .venv/bin/activate
 export WORDLY_TOKEN="wordly-local-demo-test-secret"
 export WORDLY_WORKERS="http://127.0.0.1:8765,http://127.0.0.1:8766"
