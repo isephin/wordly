@@ -19,13 +19,27 @@ A local word frequency analyzer built with Python and Flask for a Parallel and D
 
 ## Getting started
 
-Python 3.9 or later. The following commands are for macOS and Linux:
+Python 3.9 or later.
+
+### macOS and Linux
 
 ```sh
 git clone https://github.com/isephin/wordly.git
 cd wordly
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m research.generate_dataset
+python app.py
+```
+
+### Windows (PowerShell)
+
+```powershell
+git clone https://github.com/isephin/wordly.git
+cd wordly
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python -m research.generate_dataset
 python app.py
