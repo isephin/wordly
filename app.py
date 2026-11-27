@@ -7,12 +7,6 @@ from file_reader import extract
 from pathlib import Path
 
 from flask import Flask, render_template, request, jsonify
-from analyzer import (
-    sequential_analysis,
-    parallel_analysis,
-    calculate_metrics,
-    get_top_words
-)
 
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True

@@ -10,3 +10,4 @@ results/runs/
 *.zip
 update_ui.py
 update_visual.py
+wordly_results/

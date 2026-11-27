@@ -31,7 +31,13 @@ python generate_dataset.py
 python app.py
 ```
 
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original console program is available with `python main.py`.
+Open [http://127.0.0.1:5000](http://127.0.0.1:5000). The application runs locally; no network workers are needed for the Analyzer. Generate the sample datasets only if they are missing. The original baseline console program is available with `python main.py`.
+
+### Standalone console
+
+Run `python wordly_console.py` for the final numbered console interface. It uses the same counting engine and default filters as the web application, generates sample datasets in memory, and compares live sequential and parallel execution. Choose a dataset, paste text, or enter a document path. Worker selection is manual. Graphs are saved in `wordly_results/` (Matplotlib required).
+
+The console file also runs independently of the repository. Basic text analysis requires only Python; install the project dependencies for document formats and graphs.
 
 ### Analyzer
 
@@ -172,6 +178,7 @@ Python · Flask · HTML · CSS · JavaScript · `concurrent.futures.ProcessPoolE
 
 | File | Purpose |
 |---|---|
+| `wordly_console.py` | Final standalone console application |
 | `analyzer.py`, `main.py` | Original two-worker analyzer and console program |
 | `advanced_analyzer.py` | Configurable Unicode-aware counting and filters |
 | `file_reader.py` | Document text extraction |

@@ -17,6 +17,7 @@ from statistics import mean
 SIZES = (1000, 10000, 100000, 1000000)
 
 
+# Limit workers based on available CPU cores.
 def worker_limit():
     return max(2, min(14, os.cpu_count() or 2))
 
@@ -91,9 +92,11 @@ def run(lines,opt,parallel=False):
     jobs=[(chunk,opt) for chunk in chunks]; counts=Counter()
     # Merge the counters returned by each chunk.
     if parallel:
+        # Process chunks using separate processes.
         with ProcessPoolExecutor(max_workers=n,mp_context=get_context('spawn')) as pool:
             for result in pool.map(count_chunk,jobs): counts.update(result)
     else:
+        # Process each chunk one at a time.
         for job in jobs: counts.update(count_chunk(job))
     return counts,perf_counter()-start
 
@@ -258,8 +261,11 @@ def analyze(lines, workers, trials=1):
         reference = seq
         seq_times.append(st)
         par_times.append(pt)
+    # Get the average time across all trials.
     st, pt = mean(seq_times), mean(par_times)
+    # Compare sequential time against parallel time.
     speedup = st / pt
+    # Efficiency is speedup divided by the worker count.
     return {'lines': len(lines), 'workers': workers, 'sequential': st,
             'parallel': pt, 'speedup': speedup,
             'efficiency': speedup / workers * 100,
