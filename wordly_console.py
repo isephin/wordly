@@ -58,7 +58,7 @@ def stemmer():
 
 def options(raw):
     # Keep the shared engine settings valid. The console uses the defaults
-    # below and lets the user choose the number of workers.
+    # below and lets the user choose the number of workers and stop word removal.
     if not isinstance(raw, dict):
         raise ValueError("Settings must be an object.")
     if raw.get("case") and raw.get("stem"):
@@ -353,7 +353,7 @@ def sample_lines(size):
 # 5. Performance comparison
 
 
-def analyze(lines, workers, trials=1):
+def analyze(lines, workers, trials=1, remove_stop_words=True):
     # Remove blank lines and reject empty or oversized inputs before timing.
     lines = [line for line in lines if line.strip()]
     if not lines:
@@ -362,7 +362,8 @@ def analyze(lines, workers, trials=1):
         raise ValueError('Text exceeds the analysis limit.')
     # Do not request more workers than needed for the number of lines.
     workers = min(workers, max(2, len(lines)))
-    opt = options({'workers': workers})
+    # Apply the same stop word setting to both counting methods.
+    opt = options({'workers': workers, 'stop': remove_stop_words})
     seq_times, par_times = [], []
     reference = None
     for trial in range(trials):
@@ -394,7 +395,8 @@ def analyze(lines, workers, trials=1):
     return {'lines': len(lines), 'workers': workers, 'sequential': st,
             'parallel': pt, 'speedup': speedup,
             'efficiency': speedup / workers * 100,
-            'counts': reference, 'trials': trials}
+            'counts': reference, 'trials': trials,
+            'stop_words_removed': remove_stop_words}
 
 
 # 6. Displaying results and saving graphs
@@ -418,6 +420,7 @@ def print_results(result):
     print(f"Input lines     : {result['lines']:,}")
     print(f"Parallel workers: {result['workers']}")
     print(f"Trials          : {result['trials']}")
+    print("Stop words      : " + ("Removed" if result['stop_words_removed'] else "Included"))
     print(f"Sequential time : {result['sequential']:.6f} seconds")
     print(f"Parallel time   : {result['parallel']:.6f} seconds")
     print(f"Speedup         : {result['speedup']:.4f}x")
@@ -504,6 +507,17 @@ def read_workers():
     return workers
 
 
+def read_stop_words():
+    # Keep the original benchmark filters unless the user chooses otherwise.
+    while True:
+        value = input("Remove stop words? (Y/n) [Y]: ").strip().lower()
+        if value in ("", "y", "yes"):
+            return True
+        if value in ("n", "no"):
+            return False
+        print("Please enter Y or N.")
+
+
 def main():
     while True:
         print('\n' + '=' * 65)
@@ -523,18 +537,20 @@ def main():
                 print('Invalid selection.')
                 continue
             workers = read_workers()
+            remove_stop_words = read_stop_words()
             if choice == '7':
-                # Use the same worker count for all four dataset sizes.
+                # Use the same worker count and stop word setting for all four datasets.
                 trials = int(input('Trials per dataset [1]: ').strip() or '1')
                 if not 1 <= trials <= 8:
                     raise ValueError('Choose 1-8 trials.')
                 results = []
                 for size in SIZES:
                     print(f'\nDataset: {size:,} responses', flush=True)
-                    results.append(analyze(sample_lines(size), workers, trials))
+                    results.append(analyze(sample_lines(size), workers, trials, remove_stop_words))
                 print(f"\n{'Lines':>10} {'Workers':>8} {'Seq (s)':>12} {'Par (s)':>12} {'Speedup':>9} {'Eff. (%)':>9}")
                 for r in results:
                     print(f"{r['lines']:>10,} {r['workers']:>8} {r['sequential']:>12.6f} {r['parallel']:>12.6f} {r['speedup']:>9.3f} {r['efficiency']:>9.2f}")
+                print("Stop words: " + ("Removed" if remove_stop_words else "Included"))
                 print('All word counts match.')
             else:
                 if choice in ('1', '2', '3', '4'):
@@ -552,7 +568,7 @@ def main():
                         if line == ':end':
                             break
                         lines.append(line)
-                result = analyze(lines, workers)
+                result = analyze(lines, workers, remove_stop_words=remove_stop_words)
                 print_results(result)
                 results = [result]
             plot_results(results)
