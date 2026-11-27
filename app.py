@@ -84,7 +84,7 @@ def analyze():
         words=[dict(word=w,count=n) for w,n in ranked]
         total = sum(seq.values())
         raw, excluded = word_statistics(lines, opt, seq)
-        # Keep previews bounded; keyword lookup covers the first 10,000 lines.
+        # Search previews are limited to 10,000 lines.
         preview=[dict(original=line[:2000], processed=terms(line[:2000],opt)) for line in lines[:min(10000,len(lines))]]
         comparison=[]
         if len(docs)>1:

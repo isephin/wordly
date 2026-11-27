@@ -1,4 +1,4 @@
-"""Trusted LAN coordinator; HTTP transport is not encrypted."""
+"""HTTP coordinator for trusted networks (unencrypted)."""
 import json, os
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -30,7 +30,7 @@ def call(url, token, path, payload=None):
         return json.loads(data)
 
 def batches(lines, opt):
-    # Exact UTF-8 JSON size, including separators and options.
+    # Include JSON overhead in the byte count.
     overhead = len(json.dumps({'lines': [], 'options': opt}, ensure_ascii=False).encode('utf-8'))
     limit = min(MAX_BYTES, 4 * 1024 * 1024)
     batch, size = [], overhead

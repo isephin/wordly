@@ -176,8 +176,8 @@ function renderResults(data) {
     }
 
     $("verification").textContent = data.identical
-        ? "✓ Both methods returned the same counts."
-        : "✕ Verification failed — word frequencies differ.";
+        ? "Both methods returned the same counts."
+        : "Verification failed: word counts differ.";
 
     $("verification").style.color =
         data.identical ? "#b6dbb0" : "#ef827a";
@@ -479,7 +479,7 @@ function buildFrequencyGraph(words, id) {
     defs.appendChild(filter);
     svg.appendChild(defs);
 
-    // Background grid: actual frequency values.
+    // Frequency grid.
     const ticks = [...new Set(
         Array.from({length: 5}, (_, i) =>
             Math.round(maximum * i / 4)
@@ -506,7 +506,7 @@ function buildFrequencyGraph(words, id) {
         });
     });
 
-    // Glow radius and intensity depend on word count.
+    // Scale the glow by frequency.
     points.forEach(point => {
         const ratio = point.count / maximum;
 
@@ -521,7 +521,7 @@ function buildFrequencyGraph(words, id) {
         }));
     });
 
-    // Smooth curve connecting actual frequency points.
+    // Connect frequency points.
     let curve = `M ${points[0].x} ${points[0].y}`;
 
     for (let i = 1; i < points.length; i++) {
@@ -683,7 +683,7 @@ function renderVisual(){
     items.forEach(w=> $('word-bars').append(bar(w.word,w.count,max,format(w.count))));
 }
 
-// Place larger words near the centre, then pack smaller words around them.
+// Place larger words first.
 function layoutClusters(items) {
     if(!items.length)return;
     const maximum = Math.max(1,...items.map(w=>w.count));
@@ -708,7 +708,7 @@ function layoutClusters(items) {
             const rows=Math.max(1,Math.ceil(measure.measureText(item.word).width/Math.max(1,w-16)));
             const h=aura?Math.max(font*(rows*1.2+2.2)+18,diameter*.76):font*1.35*rows+12;
             let point=null;
-            // Deterministic spiral, with collision checks for readable labels.
+            // Check for overlaps along the spiral.
             for(let k=0;k<7000;k++){
                 const angle=k*2.3999632297;
                 const r=6.5*Math.sqrt(k);
@@ -743,7 +743,7 @@ function layoutClusters(items) {
         placed.forEach(p=>{p.node.style.left=(p.x-p.w/2+shift)+'px';p.node.style.top=(p.y-p.h/2-low+margin)+'px';});
     }
 }
-// Circle area is proportional to the actual word count.
+// Circle area scales with word count.
 function renderCircleMap(items, maximum) {
     const host = $('aura-view');
     host.replaceChildren();
@@ -755,7 +755,7 @@ function renderCircleMap(items, maximum) {
     items.forEach((item,i)=>{
         const r = base/2 * Math.sqrt(item.count/maximum);
         let point = null;
-        // Prefer compact circular packing around the largest word.
+        // Pack circles around the largest word.
         for(let k=0;k<12000;k++){
             const distance=3.5*Math.sqrt(k);
             const angle=k*2.3999632297;

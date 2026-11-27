@@ -63,7 +63,7 @@ def main():
 
         for trial in range(1, TRIALS + 1):
 
-            # Alternate execution order to reduce order bias.
+            # Alternate which method runs first.
             if trial % 2 == 1:
                 seq_counts, seq_time = sequential_analysis(lines)
                 par_counts, par_time = parallel_analysis(lines)

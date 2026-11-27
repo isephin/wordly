@@ -11,6 +11,6 @@ def main():
   o=options(raw); a,_=run(lines,o);b,_=run(lines,o,True);assert a==b==expected,(raw,a,expected)
  o=options({'numbers':True,'stem':True,'workers':3});a,_=run(lines,o);b,_=run(lines,o,True);assert a==b and a['run']==2 and a['42']==1
  assert extract('x.txt',b'hello\nworld')[0]==['hello','world']
- # PDF fixture is generated separately for the review.
+ # The PDF test file is generated separately.
  print('Exact counts, TXT and worker tests passed')
 if __name__=='__main__':main()

@@ -1,4 +1,4 @@
-"""Separate exploratory scaling experiment; never overwrites baseline CSVs."""
+"""Benchmark different worker counts without replacing baseline results."""
 import argparse, csv, os, platform, sys
 from datetime import datetime
 from pathlib import Path

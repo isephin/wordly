@@ -1,4 +1,4 @@
-"""Configurable analysis; original benchmark engine is intentionally unchanged."""
+"""Word counting with configurable filters."""
 import re
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor

@@ -1,4 +1,4 @@
-"""Local calibration for default-filter word counting; not a universal performance model."""
+"""Select workers using local timings with default filters."""
 import json, math, os, platform, sys
 from pathlib import Path
 
