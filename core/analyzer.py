@@ -2,6 +2,7 @@ import re
 from collections import Counter
 from time import perf_counter
 
+# Original two-worker counting engine, retained for the initial benchmark.
 STOP_WORDS = set("""
 a an the is am are was were be been being
 and or but if of at by for with about
@@ -19,6 +20,7 @@ please
 WORD_PATTERN = re.compile(r"[a-z]+")
 
 
+# Lowercase the text, extract letters and remove common words.
 def preprocess_text(text):
     words = WORD_PATTERN.findall(text.lower())
 
@@ -28,6 +30,7 @@ def preprocess_text(text):
     ]
 
 
+# Count one chunk independently using Counter.
 def count_words(lines):
     frequencies = Counter()
 
@@ -38,6 +41,7 @@ def count_words(lines):
     return frequencies
 
 
+# Split the input into two nearly equal parts.
 def split_dataset(lines):
     midpoint = (len(lines) + 1) // 2
 
@@ -47,6 +51,7 @@ def split_dataset(lines):
     ]
 
 
+# Count both chunks one after another in the main process.
 def sequential_analysis(lines):
     start = perf_counter()
 
@@ -61,6 +66,7 @@ def sequential_analysis(lines):
     return frequencies, elapsed
 
 
+# Rank counts descending and break ties alphabetically.
 def get_top_words(frequencies, limit=10):
     return sorted(
         frequencies.items(),
@@ -68,6 +74,7 @@ def get_top_words(frequencies, limit=10):
     )[:limit]
 
 
+# Assign the same two chunks to separate processes and merge the counts.
 def parallel_analysis(lines):
     from concurrent.futures import ProcessPoolExecutor
 
@@ -87,6 +94,7 @@ def parallel_analysis(lines):
     return frequencies, elapsed
 
 
+# Original benchmark uses exactly two workers for its efficiency calculation.
 def calculate_metrics(sequential_time, parallel_time):
     speedup = sequential_time / parallel_time
     efficiency = (speedup / 2) * 100

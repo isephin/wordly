@@ -1,3 +1,4 @@
+// Input state and shared display helpers.
 let selected = "small";
 let analyzing = false;
 
@@ -14,6 +15,7 @@ const colors = [
     "#e599ac", "#a8d2bd"
 ];
 
+// Dataset and upload selection handlers.
 document.querySelectorAll(".dataset").forEach(button => {
     button.addEventListener("click", () => {
         document.querySelectorAll(".dataset").forEach(b => {
@@ -45,6 +47,7 @@ $("file").addEventListener("change", () => {
     }
 });
 
+// Shared bar chart builder.
 function bar(label, value, max, display, color) {
     const row = document.createElement("div");
     row.className = "bar-row";
@@ -71,6 +74,7 @@ function bar(label, value, max, display, color) {
     return row;
 }
 
+// Display the word counts and performance metrics returned by Python.
 function renderResults(data) {
     $("results").hidden = false;
     current = data; page = 0;
@@ -186,6 +190,7 @@ function renderResults(data) {
     $("results").scrollIntoView({behavior: "smooth"});
 }
 
+// Send selected text, documents and options to Flask, then render its JSON response.
 $("analyze").addEventListener("click", async () => {
     const form = new FormData();
 
@@ -235,6 +240,7 @@ $("analyze").addEventListener("click", async () => {
     }
 });
 
+// Load the original recorded benchmark from the API.
 async function loadBenchmarks() {
     try {
         const response = await fetch("/api/benchmarks");
@@ -410,6 +416,7 @@ function animateHero() {
     });
 }
 
+// Draw the frequency curve from the ranked words.
 function buildFrequencyGraph(words, id) {
     const items = words.slice(0, 5);
 
@@ -663,9 +670,19 @@ animateHero();
 let current=null, page=0, columnGeneration=0;
 $('opt-stem').addEventListener('change', () => { if ($('opt-stem').checked) $('opt-case').checked = false; });
 $('opt-case').addEventListener('change', () => { if ($('opt-case').checked) $('opt-stem').checked = false; });
-function readOptions(){const out={}; for(const k of ['stop','case','numbers','stem','length','frequency','ngram','workers','exclude','include']){const e=$('opt-'+k);out[k]=e.type==='checkbox'?e.checked:e.value;} return out;}
+// Collect analysis settings from the form.
+function readOptions() {
+    const out = {};
+    for (const k of ['stop','case','numbers','stem','length','frequency','ngram','workers','exclude','include']) {
+        const e = $('opt-' + k);
+        out[k] = e.type === 'checkbox' ? e.checked : e.value;
+    }
+    return out;
+}
 $('reset-options').onclick=()=>{for(const [k,v] of Object.entries({stop:true,case:false,numbers:false,stem:false,length:1,frequency:1,ngram:1,workers:2,exclude:'',include:''})){const e=$('opt-'+k);if(e.type==='checkbox')e.checked=v;else e.value=v;}};
+// Ask Flask for CSV/XLSX headers and ignore responses from outdated selections.
 async function loadColumns(){const generation=++columnGeneration;const files=Array.from($('file').files); $('columns').replaceChildren(); $('analyze').disabled=true;try{for(const [i,f] of files.entries()){if(!/\.(csv|xlsx)$/i.test(f.name))continue;const body=new FormData();body.append('file',f);const r=await fetch('/api/columns',{method:'POST',body});const names=await r.json();if(generation!==columnGeneration||$('file').files[i]?.name!==f.name)return;if(!r.ok)throw Error(names.error);const label=document.createElement('label');label.textContent=f.name+' · column ';const select=document.createElement('select');select.id='column-'+i;select.add(new Option('All columns',''));names.forEach((name,index)=>select.add(new Option(name,index)));label.appendChild(select);$('columns').appendChild(label);}}catch(e){$('status').textContent=e.message;}finally{if(generation===columnGeneration&&!analyzing)$('analyze').disabled=false;}}
+// Refresh statistics, tables, charts and document comparisons.
 function refreshExtras(){if(!current)return; const d=current; $('extra-stats').replaceChildren();for(const [label,value] of [['Total words',format(d.raw_words)],['Characters (no line breaks)',format(d.characters)],['Words excluded',format(d.excluded_words)]]){const div=document.createElement('div'), l=document.createElement('span'),v=document.createElement('strong');l.textContent=label;v.textContent=value;div.append(l,v);$('extra-stats').append(div);} $('live-config').textContent=`${d.options.workers} parallel workers · ${["", "Single words", "Two-word phrases", "Three-word phrases"][Number(d.options.ngram)]}. Benchmarks use the original settings. ${d.worker_selection||""}`;renderVisual();renderTable();showContext(false);renderComparison();}
 function renderVisual(){
     if(!current)return;
@@ -798,9 +815,11 @@ const clusterObserver=new ResizeObserver(()=>{
 });
 clusterObserver.observe($('aura-view'));
 
+// Search and sort the result table in the browser.
 function filtered(){const query=$('word-search').value.toLowerCase(),sort=$('word-sort').value;return current.words.filter(w=>w.word.toLowerCase().includes(query)).sort((a,b)=>sort==='alpha'?a.word.localeCompare(b.word):sort==='asc'?a.count-b.count||a.word.localeCompare(b.word):b.count-a.count||a.word.localeCompare(b.word));}
 function renderTable(){if(!current)return;const rows=filtered(), pages=Math.max(1,Math.ceil(rows.length/25));page=Math.min(page,pages-1);$('frequency-table').replaceChildren();for(const w of rows.slice(page*25,page*25+25)){const tr=document.createElement('tr');const a=document.createElement('button');a.className='term-link';a.textContent=w.word;a.onclick=()=>{$('context-search').value=w.word;$('context-output').closest('details').open=true;showContext(true);};const td=document.createElement('td');td.append(a);tr.append(td);for(const v of [format(w.count),(100*w.count/current.total_words).toFixed(2)+'%']){const cell=document.createElement('td');cell.textContent=v;tr.append(cell);}$('frequency-table').append(tr);} $('page-info').textContent=`${rows.length} matches · ${page+1}/${pages}`;$('prev-page').disabled=page===0;$('next-page').disabled=page+1>=pages;}
 for(const id of ['word-search','word-sort'])$(id).addEventListener('input',()=>{page=0;renderTable();});$('prev-page').onclick=()=>{page--;renderTable();};$('next-page').onclick=()=>{page++;renderTable();};$('top-limit').onchange=renderVisual;
+// Search the bounded text preview returned by the backend.
 function showContext(find) {
     if (!current) return;
     const query = $('context-search').value.trim();
@@ -813,20 +832,25 @@ function showContext(find) {
     ).join('\n') || 'No matches in the preview.';
 }
 $('context-find').onclick=()=>showContext(true);$('preview-mode').onchange=()=>showContext(true);
+// Export the current results using a temporary browser download URL.
 function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function csvText(){return 'Word or phrase,Count\n'+filtered().map(w=>'"'+w.word.replace(/"/g,'""')+'",'+w.count).join('\n');}
 $('csv-export').onclick=()=>download('wordly-frequency.csv',csvText(),'text/csv');$('json-export').onclick=()=>{const {preview,comparison,...data}=current;download('wordly-results.json',JSON.stringify(data,null,2),'application/json');};$('copy-export').onclick=async()=>{try{await navigator.clipboard.writeText(csvText());$('copy-export').textContent='Copied';}catch(e){$('copy-export').textContent='Copy failed';}};
 $('png-export').onclick=()=>{const original=$('result-spectrum').querySelector('svg');if(!original)return;const svg=original.cloneNode(true);svg.setAttribute('xmlns','http://www.w3.org/2000/svg');const nodes=svg.querySelectorAll('*'), originals=original.querySelectorAll('*');nodes.forEach((n,i)=>{const style=getComputedStyle(originals[i]);for(const key of ['fill','stroke','stroke-width','font-size','font-family','opacity','stroke-dasharray']){const v=style.getPropertyValue(key);if(v&&!v.includes('url('))n.style.setProperty(key,key==='opacity'&&n.classList.contains('frequency-node')?'1':key==='opacity'&&n.classList.contains('frequency-area')?'.045':v);}n.style.animation='none';});svg.querySelectorAll('animateMotion,.light-particle').forEach(n=>n.remove());svg.querySelectorAll('.frequency-line').forEach(n=>n.style.strokeDashoffset='0');const vb=original.viewBox.baseVal;svg.setAttribute('width',vb.width);svg.setAttribute('height',vb.height);const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=vb.width*2;c.height=vb.height*2;const ctx=c.getContext('2d');ctx.fillStyle='#101014';ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);c.toBlob(b=>{if(b)download('wordly-graph.png',b,'image/png');});URL.revokeObjectURL(url);};img.onerror=()=>{$('status').textContent='PNG export failed.';URL.revokeObjectURL(url);};img.src=url;};
+// Compare the relative frequencies of common words across uploaded documents.
 function renderComparison(){const host=$('comparison');host.replaceChildren();if(current.comparison.length<2)return;const h=document.createElement('h3');h.textContent='Compare files';host.append(h);for(const doc of current.comparison){const title=document.createElement('p');title.textContent=doc.name+' · '+format(doc.total)+' counted';host.append(title);for(const w of current.words.slice(0,10)){const n=Object.prototype.hasOwnProperty.call(doc.counts,w.word)?doc.counts[w.word]:0;const share=doc.total?n/doc.total*100:0;host.append(bar(w.word,share,100,share.toFixed(2)+'%'));}}}
+// Local browser history stores summary metrics, not document text.
 function historyRows(){try{return JSON.parse(localStorage.getItem('wordly-history')||'[]');}catch{return [];}}
 function showHistory(){ $('history').replaceChildren();for(const d of historyRows()){const p=document.createElement('p');p.textContent=`${d.date} · ${format(d.lines)} lines · ${d.speedup.toFixed(3)}× speedup`; $('history').append(p);}}
 function recordHistory(d){try{localStorage.setItem('wordly-history',JSON.stringify([{date:new Date().toLocaleString(),lines:d.responses,speedup:d.speedup},...historyRows()].slice(0,20)));}catch{}showHistory();}
 $('clear-history').onclick=()=>{try{localStorage.removeItem('wordly-history');}catch{}showHistory();};showHistory();
+// Handle drag-and-drop uploads.
 const dropArea=document.querySelector('.upload');
 for(const event of ['dragenter','dragover'])dropArea.addEventListener(event,e=>{e.preventDefault();dropArea.classList.add('dragging');});
 for(const event of ['dragleave','drop'])dropArea.addEventListener(event,e=>{e.preventDefault();dropArea.classList.remove('dragging');});
 dropArea.addEventListener('drop',e=>{if(e.dataTransfer.files.length){$('file').files=e.dataTransfer.files;$('file').dispatchEvent(new Event('change'));}});
 
+// Back-to-top navigation.
 const backTop = $('back-to-top');
 function updateBackTop(){backTop.hidden=window.scrollY<300;}
 window.addEventListener('scroll',updateBackTop,{passive:true});
